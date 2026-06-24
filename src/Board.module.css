@@ -1,4 +1,16 @@
 .root {
+  /* Layout */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  container-type: size;
+
+  /* Box model */
+  width: 100%;
+  height: 100%;
+}
+
+.board {
   --tracks: repeat(15, 1fr);
   --line-thickness: 1px;
 
@@ -8,6 +20,7 @@
   grid-template-rows: var(--tracks);
 
   /* Box model */
+  width: min(100cqmin, 40rem);
   aspect-ratio: 1;
 
   /* Visual */
