@@ -1,5 +1,9 @@
 # Infinite Gomoku
 
+## Scripts
+
+Prefer the project's npm scripts over invoking the underlying tools directly (e.g. run `npm run typecheck`, not `npx tsc`). The scripts encode the project's intended flags, so they stay correct as configuration changes. Check the `scripts` field in `package.json` for what's available.
+
 ## Styling
 
 - Use **CSS Modules** for component styles. Name files `*.module.css` (co-located with the component).
