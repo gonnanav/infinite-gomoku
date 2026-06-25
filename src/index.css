@@ -7,6 +7,8 @@
 :root {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {

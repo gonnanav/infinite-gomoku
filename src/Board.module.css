@@ -11,8 +11,10 @@
 }
 
 .board {
-  --tracks: repeat(15, 1fr);
-  --line-thickness: 1px;
+  --size: 15; /* intersections per side */
+  --board-width: min(100cqmin, 40rem);
+  --cell-width: calc(var(--board-width) / var(--size));
+  --tracks: repeat(var(--size), 1fr);
 
   /* Layout */
   display: grid;
@@ -20,16 +22,45 @@
   grid-template-rows: var(--tracks);
 
   /* Box model */
-  width: min(100cqmin, 40rem);
+  width: var(--board-width);
   aspect-ratio: 1;
+  padding: calc(var(--cell-width) / 2); /* half a cell, so edge stones don't touch the board edge */
+  border-radius: 0.5rem;
 
   /* Visual */
   background: #dcb35c;
 }
 
 .intersection {
+  --line-thickness: 1px;
+
   /* Layout */
   position: relative;
+
+  /* Interaction */
+  cursor: pointer;
+}
+
+.stone {
+  /* Layout */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+
+  /* Box model */
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+
+  /* Visual */
+  background: #000;
+  transform: translate(-50%, -50%);
+
+  &.preview {
+    /* Visual */
+    opacity: 0.3;
+  }
 }
 
 /* Lines run through each element's center, so a stone placed there sits on the intersection. */
