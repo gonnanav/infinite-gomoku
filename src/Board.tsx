@@ -91,11 +91,14 @@ function Board() {
           const edgeBottom = row === lastIndex;
           const edgeLeft = col === 0;
 
-          const showStone = isPlaced(coordinate) || isPreviewed(coordinate);
+          const placed = isPlaced(coordinate);
+          const showStone = placed || isPreviewed(coordinate);
+          const value = placed ? 'black' : 'empty';
 
           return (
             <div
               key={coordinateKey(coordinate)}
+              data-testid={`intersection-${row}-${col}`}
               className={clsx(classes.intersection, {
                 [classes.edgeTop]: edgeTop,
                 [classes.edgeRight]: edgeRight,
@@ -105,8 +108,9 @@ function Board() {
               onPointerEnter={(event) => handleIntersectionPointerEnter(event, coordinate)}
               onClick={() => previewOrPlace(coordinate)}
             >
+              <span className="visually-hidden">{value}</span>
               {showStone && (
-                <div className={clsx(classes.stone, { [classes.preview]: isPreviewed(coordinate) })} />
+                <div aria-hidden className={clsx(classes.stone, { [classes.preview]: isPreviewed(coordinate) })} />
               )}
             </div>
           );
