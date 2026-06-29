@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import classes from './Board.module.css';
 
 type Coordinate = { row: number; col: number };
+type IntersectionState = 'empty' | 'black' | 'preview';
 
 const size = 15; // intersections per side
 const intersections = size * size;
@@ -11,14 +12,15 @@ const lastIndex = size - 1;
 const initialStones = new Set<string>();
 
 export function Board() {
-  const { isPlaced, isPreviewed, placeStone, previewStone, clearPreview } = useBoard();
+  const { stateAt, placeStone, previewStone, clearPreview } = useBoard();
 
   // Clicking previews an intersection; clicking the same one again places a stone.
   // On desktop the pointer hover previews, so a single click places.
   function previewOrPlace(coordinate: Coordinate) {
-    if (isPlaced(coordinate)) {
+    const state = stateAt(coordinate);
+    if (state === 'black') {
       clearPreview();
-    } else if (isPreviewed(coordinate)) {
+    } else if (state === 'preview') {
       placeStone(coordinate);
     } else {
       previewStone(coordinate);
@@ -29,7 +31,7 @@ export function Board() {
   function handleIntersectionPointerEnter(event: PointerEvent, coordinate: Coordinate) {
     if (event.pointerType !== 'mouse') return;
 
-    if (isPlaced(coordinate)) {
+    if (stateAt(coordinate) === 'black') {
       clearPreview();
     } else {
       previewStone(coordinate);
@@ -55,9 +57,9 @@ export function Board() {
           const edgeBottom = row === lastIndex;
           const edgeLeft = col === 0;
 
-          const placed = isPlaced(coordinate);
-          const showStone = placed || isPreviewed(coordinate);
-          const value = placed ? 'black' : 'empty';
+          const state = stateAt(coordinate);
+          const showStone = state === 'black' || state === 'preview';
+          const value = state === 'black' ? 'black' : 'empty';
 
           return (
             <div
@@ -74,7 +76,7 @@ export function Board() {
             >
               <span className="visually-hidden">{value}</span>
               {showStone && (
-                <div aria-hidden className={clsx(classes.stone, { [classes.preview]: isPreviewed(coordinate) })} />
+                <div aria-hidden className={clsx(classes.stone, { [classes.preview]: state === 'preview' })} />
               )}
             </div>
           );
@@ -88,12 +90,10 @@ function useBoard() {
   const [stones, setStones] = useState(initialStones);
   const [previewedStone, setPreviewedStone] = useState<Coordinate | null>(null);
 
-  function isPlaced(coordinate: Coordinate) {
-    return stones.has(coordinateKey(coordinate));
-  }
-
-  function isPreviewed(coordinate: Coordinate) {
-    return previewedStone !== null && coordinatesEqual(previewedStone, coordinate);
+  function stateAt(coordinate: Coordinate): IntersectionState {
+    if (stones.has(coordinateKey(coordinate))) return 'black';
+    if (previewedStone !== null && coordinatesEqual(previewedStone, coordinate)) return 'preview';
+    return 'empty';
   }
 
   function placeStone(coordinate: Coordinate) {
@@ -109,7 +109,7 @@ function useBoard() {
     setPreviewedStone(null);
   }
 
-  return { isPlaced, isPreviewed, placeStone, previewStone, clearPreview };
+  return { stateAt, placeStone, previewStone, clearPreview };
 }
 
 function coordinateKey({ row, col }: Coordinate) {
