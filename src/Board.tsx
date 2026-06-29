@@ -1,14 +1,9 @@
 import { useState, type PointerEvent } from 'react';
-import clsx from 'clsx';
+import { Intersection } from './Intersection.tsx';
+import { type Coordinate, type IntersectionState, boardSize } from './board.ts';
 import classes from './Board.module.css';
 
-type Coordinate = { row: number; col: number };
-type IntersectionState = 'empty' | 'black' | 'preview';
-
-const size = 15; // intersections per side
-const intersections = size * size;
-const lastIndex = size - 1;
-
+const intersections = boardSize * boardSize;
 const initialStones = new Set<string>();
 
 export function Board() {
@@ -48,37 +43,18 @@ export function Board() {
     <div className={classes.root}>
       <div className={classes.board} onPointerLeave={handleBoardPointerLeave}>
         {Array.from({ length: intersections }, (_, i) => {
-          const row = Math.floor(i / size);
-          const col = i % size;
+          const row = Math.floor(i / boardSize);
+          const col = i % boardSize;
           const coordinate = { row, col };
 
-          const edgeTop = row === 0;
-          const edgeRight = col === lastIndex;
-          const edgeBottom = row === lastIndex;
-          const edgeLeft = col === 0;
-
-          const state = stateAt(coordinate);
-          const showStone = state === 'black' || state === 'preview';
-          const value = state === 'black' ? 'black' : 'empty';
-
           return (
-            <div
+            <Intersection
               key={coordinateKey(coordinate)}
-              data-testid={`intersection-${row}-${col}`}
-              className={clsx(classes.intersection, {
-                [classes.edgeTop]: edgeTop,
-                [classes.edgeRight]: edgeRight,
-                [classes.edgeBottom]: edgeBottom,
-                [classes.edgeLeft]: edgeLeft,
-              })}
-              onPointerEnter={(event) => handleIntersectionPointerEnter(event, coordinate)}
-              onClick={() => previewOrPlace(coordinate)}
-            >
-              <span className="visually-hidden">{value}</span>
-              {showStone && (
-                <div aria-hidden className={clsx(classes.stone, { [classes.preview]: state === 'preview' })} />
-              )}
-            </div>
+              coordinate={coordinate}
+              state={stateAt(coordinate)}
+              onPointerEnter={handleIntersectionPointerEnter}
+              onClick={previewOrPlace}
+            />
           );
         })}
       </div>
