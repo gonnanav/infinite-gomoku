@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { Intersection } from './Intersection.tsx';
 import { type Coordinate, type IntersectionState, boardSize } from './board.ts';
 import classes from './Board.module.css';
@@ -8,6 +8,12 @@ const initialStones = new Set<string>();
 
 export function Board() {
   const { stateAt, placeStone, previewOrPlaceStone } = useBoard();
+
+  function handleIntersectionKeyDown(event: KeyboardEvent, coordinate: Coordinate) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    placeStone(coordinate);
+  }
 
   // On mobile (no hover), first tap previews and second tap places.
   function handleIntersectionClick(coordinate: Coordinate) {
@@ -31,6 +37,7 @@ export function Board() {
               key={coordinateKey(coordinate)}
               coordinate={coordinate}
               state={stateAt(coordinate)}
+              onKeyDown={handleIntersectionKeyDown}
               onClick={handleIntersectionClick}
             />
           );

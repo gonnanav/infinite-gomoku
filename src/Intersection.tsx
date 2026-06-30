@@ -1,3 +1,4 @@
+import { type KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { type Coordinate, type IntersectionState, boardSize } from './board.ts';
 import classes from './Intersection.module.css';
@@ -5,13 +6,14 @@ import classes from './Intersection.module.css';
 type IntersectionProps = {
   coordinate: Coordinate;
   state: IntersectionState;
+  onKeyDown: (event: KeyboardEvent, coordinate: Coordinate) => void;
   onClick: (coordinate: Coordinate) => void;
 };
 
 const lastIndex = boardSize - 1;
 const centerIndex = Math.floor((boardSize - 1) / 2);
 
-export function Intersection({ coordinate, state, onClick }: IntersectionProps) {
+export function Intersection({ coordinate, state, onKeyDown, onClick }: IntersectionProps) {
   const { row, col } = coordinate;
   const tabIndex = row === centerIndex && col === centerIndex ? 0 : -1;
 
@@ -32,6 +34,7 @@ export function Intersection({ coordinate, state, onClick }: IntersectionProps) 
         [classes.edgeLeft]: edgeLeft,
       })}
       tabIndex={tabIndex}
+      onKeyDown={(event) => onKeyDown(event, coordinate)}
       onClick={() => onClick(coordinate)}
     >
       <span className="visually-hidden">{value}</span>
